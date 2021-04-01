@@ -27,9 +27,6 @@ def extract_seldnet_data(feature_path: str,
     f_paths = sorted(glob(os.path.join(feature_path, '*.wav')))
     l_paths = sorted(glob(os.path.join(label_path, '*.csv')))
 
-    f_paths = f_paths[:300]
-    l_paths = l_paths[:300]
-
     if len(f_paths) != len(l_paths):
         raise ValueError('# of features and labels are not matched')
 
@@ -45,7 +42,7 @@ def extract_seldnet_data(feature_path: str,
         if name != extract_name(l):
             raise ValueError('feature, label must share the same name')
         wav, r = torchaudio.load(f)
-        f = extract_features_spec(wav, r, **kwargs)
+        f = extract_features(wav, r, **kwargs)
         l = extract_labels(l)
         f, l = preprocess_features_labels(f, l)
         
@@ -394,7 +391,7 @@ def mix_and_extract(original, mix, original_label, mix_label,
     snr = rnd.uniform(0.3,0.7)
     
     # mix two sound
-    mix, source, _, _ = adjust_noise(mixing_sound, original_sound, snr)
+#    mix, source, _, _ = adjust_noise(mixing_sound, original_sound, snr)
     mix = original_sound*snr + mixing_sound*(1-snr)
 
     ori_label_list = []
@@ -426,6 +423,7 @@ def mix_and_extract(original, mix, original_label, mix_label,
     for frame in frame_remove:
         mix[:, int(ms*frame):int(ms*(frame+1))] = \
         original_sound[:, int(ms*frame):int(ms*(frame+1))]*snr 
+    new_label = np.concatenate([ori_label, new_label], axis = 0)
     return mix, new_label
 
 
@@ -444,7 +442,7 @@ if __name__ == '__main__':
     abspath = '/home/pjh/seld-dcase2020'
     FEATURE_PATH = os.path.join(abspath, f'{mode}_dev')
     LABEL_PATH = os.path.join(abspath, 'metadata_dev')
-    USE_MIX = False
+    USE_MIX = True
 
     # should 
     FEATURE_OUTPUT_PATH = f'{mode}_dev'

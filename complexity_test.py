@@ -69,6 +69,7 @@ class ComplexityTest(tf.test.TestCase):
                               prev_cx=self.prev_cx),
             (dict_add(target_cx, self.prev_cx), target_shape))
 
+
     def test_linear_complexity(self):
         target_cx = {'flops': 1050624, 'params': 525312}
         target_shape = [2, 1024]
@@ -84,6 +85,47 @@ class ComplexityTest(tf.test.TestCase):
                               use_bias=True,
                               prev_cx=self.prev_cx),
             (dict_add(target_cx, self.prev_cx), target_shape))
+
+
+    def test_GRU_complexity(self):
+        target_cx = {'flops': 2676000, 'params': 9360}
+        target_shape = [32, 100, 30]
+        self.assertEqual(
+            GRU_complexity(input_shape=[32, 100, 20],
+                              units=30,
+                              layers=2,
+                              use_bias=True,
+                              bi=True),
+            (target_cx, target_shape))
+        self.assertEqual(
+            GRU_complexity(input_shape=[32, 100, 20],
+                              units=30,
+                              layers=2,
+                              use_bias=True,
+                              bi=True,
+                              prev_cx=self.prev_cx),
+            (dict_add(target_cx, self.prev_cx), target_shape))
+        
+        
+    def test_attention(self):
+        target_cx = {'flops': 125542400, 'params': 1052672}
+        target_shape = [1, 100, 256]
+        self.assertEqual(
+            Attention_complexity(input_shape=[1, 100, 256],
+                              num_heads=4,
+                              key_dim=256,
+                              value_dim=256,
+                              use_bias=True),
+            (target_cx, target_shape))
+        self.assertEqual(
+            Attention_complexity(input_shape=[1, 100, 256],
+                              num_heads=4,
+                              key_dim=256,
+                              value_dim=256,
+                              use_bias=True,
+                              prev_cx=self.prev_cx),
+            (dict_add(target_cx, self.prev_cx), target_shape))
+
 
     def test_safe_tuple(self):
         self.assertEqual((1, 1), safe_tuple(1, 2))

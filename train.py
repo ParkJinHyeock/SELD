@@ -97,7 +97,9 @@ def get_dataset(config, mode:str='train'):
     path = os.path.join(config.abspath, 'DCASE2020/feat_label/')
     x, y = load_seldnet_data(os.path.join(path, 'foa_dev_norm'),
                              os.path.join(path, 'foa_dev_label'), 
-                             mode=mode, n_freq_bins=64, use_gen=config.use_gen)
+                             mode=mode, n_freq_bins=64, 
+                             use_spec=config.use_spec,
+                             use_gen=config.use_gen)
     # mic_x, _ = load_seldnet_data(os.path.join(path, 'mic_dev_norm'),
     #                          os.path.join(path, 'mic_dev_label'), 
     #                          mode=mode, n_freq_bins=64)

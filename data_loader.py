@@ -51,7 +51,8 @@ def data_loader(dataset,
     return dataset
 
 
-def load_seldnet_data(feat_path, label_path, mode='train', n_freq_bins=64, use_gen=False):
+def load_seldnet_data(feat_path, label_path, mode='train',
+                      n_freq_bins=64, use_gen=False, use_spec=False):
     from glob import glob
     import os
 
@@ -75,7 +76,7 @@ def load_seldnet_data(feat_path, label_path, mode='train', n_freq_bins=64, use_g
         labels = [np.load(f).astype('float32') for f in labels
                 if int(f[f.rfind(os.path.sep)+5]) in splits[mode]]
         features = [np.load(f).astype('float32') for f in features
-                    if int(f[f.rfind(os.path.sep)+5]) in splits[mode]]
+                if int(f[f.rfind(os.path.sep)+5]) in splits[mode]]
         if len(features[0].shape) == 2:
             def extract(x):
                 x_org = x[:, :n_freq_bins*4]
@@ -96,6 +97,7 @@ def load_seldnet_data(feat_path, label_path, mode='train', n_freq_bins=64, use_g
                     if int(f[f.rfind(os.path.sep)+5]) in splits[mode]]
 
     return features, labels
+
 
 def seldnet_data_to_dataloader_gen(features: [list, tuple],
                                    labels: [list, tuple],
@@ -184,6 +186,34 @@ def seldnet_data_to_dataloader(features: [list, tuple],
     return dataset.prefetch(AUTOTUNE)
 
 
+def load_spec(path, sr, mode, n_mes, **kwgrs):
+    spec = np.load(path)
+    device = get_device()
+    melscale = torchaudio.transforms.MelScale(
+        n_mels=n_mels, sample_rate=sample_rate).to(device)
+    mel_spec = torchaudio.functional.complex_norm(spec, power=2.)
+    mel_spec = melscale(mel_spec)
+    mel_spec = torchaudio.functional.amplitude_to_DB(
+        mel_spec,
+        multiplier=10.,
+        amin=1e-10,
+        db_multiplier=np.log10(max(1., 1e-10)), # log10(max(ref, amin))
+        top_db=80.,
+    )
+    features = [mel_spec]
+    if mode == 'foa':
+        foa = foa_intensity_vectors(spec)
+        foa = melscale(foa)
+        features.append(foa)
+    elif mode == 'mic':
+        gcc = gcc_features(spec, n_mels=n_mels)
+        features.append(gcc)
+    else:
+        raise ValueError('invalid mode')
+    features = torch.cat(features, axis=0)
+    return features
+    
+    
 if __name__ == '__main__':
     ''' An example of how to use '''
     import os
