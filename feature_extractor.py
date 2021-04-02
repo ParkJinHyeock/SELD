@@ -391,8 +391,8 @@ def mix_and_extract(original, mix, original_label, mix_label,
     snr = rnd.uniform(0.3,0.7)
     
     # mix two sound
-#    mix, source, _, _ = adjust_noise(mixing_sound, original_sound, snr)
-    mix = original_sound*snr + mixing_sound*(1-snr)
+    mix, source, _, _ = adjust_noise(mixing_sound, original_sound, snr)
+   # mix = original_sound*snr + mixing_sound*(1-snr)
 
     ori_label_list = []
     with open(original_label, 'r') as o: # Original metadata
@@ -450,13 +450,13 @@ if __name__ == '__main__':
     NORM_FEATURE_PATH = f'{mode}_dev_norm'
 
     extract_seldnet_data(FEATURE_PATH, 
-                          FEATURE_OUTPUT_PATH,
-                          LABEL_PATH, 
-                          LABEL_OUTPUT_PATH,
-                          mode=mode, 
-                          win_length=960,
-                          hop_length=480,
-                          n_fft=1024)
+                         FEATURE_OUTPUT_PATH,
+                         LABEL_PATH, 
+                         LABEL_OUTPUT_PATH,
+                         mode=mode, 
+                         win_length=960,
+                         hop_length=480,
+                         n_fft=1024)
     if USE_MIX:
         extract_mix_seldnet_data(FEATURE_PATH, 
                              FEATURE_OUTPUT_PATH,
