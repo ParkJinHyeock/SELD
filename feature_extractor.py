@@ -458,14 +458,14 @@ if __name__ == '__main__':
     LABEL_OUTPUT_PATH = f'{mode}_dev_label'
     NORM_FEATURE_PATH = f'{mode}_dev_norm'
 
-    extract_seldnet_data(FEATURE_PATH, 
-                          FEATURE_OUTPUT_PATH,
-                          LABEL_PATH, 
-                          LABEL_OUTPUT_PATH,
-                          mode=mode, 
-                          win_length=960,
-                          hop_length=480,
-                          n_fft=1024)
+    # extract_seldnet_data(FEATURE_PATH, 
+    #                       FEATURE_OUTPUT_PATH,
+    #                       LABEL_PATH, 
+    #                       LABEL_OUTPUT_PATH,
+    #                       mode=mode, 
+    #                       win_length=960,
+    #                       hop_length=480,
+    #                       n_fft=1024)
     if USE_MIX:
         extract_mix_seldnet_data(FEATURE_PATH, 
                              FEATURE_OUTPUT_PATH,
